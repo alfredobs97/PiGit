@@ -1,11 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"syscall"
 )
 
 func main() {
@@ -16,6 +19,27 @@ func main() {
 	http.ListenAndServe(":3000", nil)
 
 }
+
+func checkDiskSpace() bool {
+	var stat syscall.Statfs_t
+	var isSpace = false
+	wd, err := os.Getwd()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	syscall.Statfs(wd, &stat)
+
+	var freePercentDisk = (float32(stat.Bavail) / float32(stat.Blocks)) * 100
+
+	if freePercentDisk > 10 {
+		isSpace = true
+	}
+
+	return isSpace
+}
+
 func initGit(path string) error {
 	cmd := exec.Command("git", "init", "--bare")
 	cmd.Dir = path + ".git"
@@ -25,12 +49,18 @@ func initGit(path string) error {
 	return err
 }
 func createDirectory(path string) error {
-	path = "/repos/" + path
+	var err error
 
-	err := os.MkdirAll(path+".git", os.ModePerm)
+	if checkDiskSpace() {
+		path = "/repos/" + path
 
-	if err == nil {
-		err = initGit(path)
+		err = os.MkdirAll(path+".git", os.ModePerm)
+
+		if err == nil {
+			err = initGit(path)
+		}
+	} else {
+		err = errors.New("No space disk available")
 	}
 
 	return err
