@@ -12,11 +12,11 @@ jobs:
           go-version: 1.13
 
       - name: Build
-				env:
-					GOPROXY: "https://proxy.golang.org"
+        env:
+          GOPROXY: "https://proxy.golang.org"
         run: make
 
       - name: Test
-				env:
-					GOPROXY: "https://proxy.golang.org"
+        env:
+          GOPROXY: "https://proxy.golang.org"
         run: make test
