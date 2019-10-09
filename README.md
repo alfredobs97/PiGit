@@ -9,9 +9,9 @@
 2. compile main.go using: 
 
 ```bash
-env GOOS=linux GOARCH=arm GOARM=5 go build
+make build
 ```
-3. Send the output file and run in your raspberry
+3. Send the output file(PiGit) and run in your raspberry 
 4. Open a browser or a http client and go to http://ip/createRepo/{yourRepoName}
 5. Your repo is created
 
